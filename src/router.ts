@@ -1,7 +1,7 @@
 import { IncomingMessage, ServerResponse } from 'http';
-import { handleCustomerRoutes } from './cadastros/customer/customer.routes';
-import { handleProductRoutes } from './cadastros/product/product.routes';
-import { handlePaymentMethodRoutes } from './cadastros/payment-method/payment-method.routes';
+import { handleCustomerRoutes } from './modules/cadastros/customer/customer.routes';
+import { handleProductRoutes } from './modules/cadastros/product/product.routes';
+import { handlePaymentMethodRoutes } from './modules/cadastros/payment-method/payment-method.routes';
 
 type RouteHandler = (req: IncomingMessage, res: ServerResponse) => void;
 

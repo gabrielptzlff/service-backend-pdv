@@ -2,7 +2,7 @@ import { Pool } from 'pg';
 import { injectable } from 'tsyringe';
 import { PaymentMethodDto } from '../dto/payment-method.dto';
 import { PaymentMethod } from '../entity/payment-method.entity';
-import { pool } from '../../../infra/db/pg-connection';
+import { pool } from '../../../../infra/db/pg-connection';
 import { IPaymentMethodRepository } from './payment-method.repository.interface';
 
 @injectable()

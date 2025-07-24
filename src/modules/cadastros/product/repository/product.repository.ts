@@ -2,9 +2,8 @@ import { Pool } from 'pg';
 import { injectable } from 'tsyringe';
 import { ProductDto } from '../dto/product.dto';
 import { Product } from '../entity/product.entity';
-import { pool } from '../../../infra/db/pg-connection';
+import { pool } from '../../../../infra/db/pg-connection';
 import { IProductRepository } from './product.repository.interface';
-import { Customer } from '../../customer/entity/customer.entity';
 
 @injectable()
 export class ProductRepository implements IProductRepository {

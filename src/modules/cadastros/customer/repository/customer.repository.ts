@@ -3,7 +3,7 @@ import { injectable } from 'tsyringe';
 import { CustomerDto } from '../dto/customer.dto';
 import { Customer } from '../entity/customer.entity';
 import { ICustomerRepository } from './customer.repository.interface';
-import { pool } from '../../../infra/db/pg-connection';
+import { pool } from '../../../../infra/db/pg-connection';
 
 @injectable()
 export class CustomerRepository implements ICustomerRepository {
