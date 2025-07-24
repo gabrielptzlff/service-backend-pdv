@@ -32,7 +32,6 @@ export class ProductService {
     }
 
     Object.assign(product, createProductDto);
-    console.log('Updating product:', product);
     return product ? this.productRepository.update(id, product) : null;
   }
 
