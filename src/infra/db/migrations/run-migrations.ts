@@ -1,11 +1,11 @@
 import {
   up as upCustomers,
   down as downCustomers,
-} from './001_create_customers_table';
+} from './001-create-customers-table';
 import {
   up as upProducts,
   down as downProducts,
-} from './002_create_products_table';
+} from './002-create-products-table';
 
 async function run() {
   const direction = process.argv[2]; // 'up' ou 'down'
