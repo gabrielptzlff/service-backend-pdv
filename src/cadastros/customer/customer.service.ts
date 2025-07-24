@@ -32,7 +32,6 @@ export class CustomerService {
     }
 
     Object.assign(customer, createCustomerDto);
-    console.log('Updating customer:', customer);
     return customer ? this.customerRepository.update(id, customer) : null;
   }
 
