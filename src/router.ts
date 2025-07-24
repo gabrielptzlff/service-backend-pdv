@@ -1,10 +1,12 @@
 import { IncomingMessage, ServerResponse } from 'http';
 import { handleCustomerRoutes } from './cadastros/customer/customer.routes';
+import { handleProductRoutes } from './cadastros/product/product.routes';
 
 type RouteHandler = (req: IncomingMessage, res: ServerResponse) => void;
 
 const routes: { [key: string]: RouteHandler } = {
   '/customers': handleCustomerRoutes,
+  '/products': handleProductRoutes,
 };
 
 export function router(req: IncomingMessage, res: ServerResponse) {

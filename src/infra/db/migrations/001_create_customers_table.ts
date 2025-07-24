@@ -15,6 +15,7 @@ export async function up() {
       state VARCHAR(100)
     );
   `);
+  // Interessante verificar se a tabela já existe antes de logar created
   console.log('Migration UP: customers table created');
 }
 
