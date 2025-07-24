@@ -10,6 +10,10 @@ import {
   up as upPaymentMethods,
   down as downPaymentMethods,
 } from './003-create-payment-methods-table';
+import {
+  up as upSales,
+  down as downSales,
+} from './004-create-sales-table';
 
 async function run() {
   const direction = process.argv[2]; // 'up' ou 'down'
@@ -17,7 +21,9 @@ async function run() {
     await upCustomers();
     await upProducts();
     await upPaymentMethods();
+    await upSales();
   } else if (direction === 'down') {
+    await downSales();
     await downPaymentMethods();
     await downProducts();
     await downCustomers();
