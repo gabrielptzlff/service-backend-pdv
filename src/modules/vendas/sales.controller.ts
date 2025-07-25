@@ -30,10 +30,7 @@ export class SalesController {
   }
 
   @Patch('/:id')
-  async update(
-    @Param('id') id: number,
-    @Body() salesDto: SalesDto,
-  ) {
+  async update(@Param('id') id: number, @Body() salesDto: SalesDto) {
     return this.salesService.update(id, salesDto);
   }
 

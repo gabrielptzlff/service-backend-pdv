@@ -14,7 +14,7 @@ export class ProductService {
     return this.productRepository.findAll();
   }
 
-  async getById(id: number): Promise<Product | null> {
+  async getById(id: number): Promise<Product | undefined> {
     return this.productRepository.findById(id);
   }
 
@@ -25,14 +25,14 @@ export class ProductService {
   async update(
     id: number,
     createProductDto: ProductDto,
-  ): Promise<Product | null> {
+  ): Promise<Product | undefined> {
     const product = await this.productRepository.findById(id);
     if (!product) {
       throw new Error(`Product with id ${id} not found`);
     }
 
     Object.assign(product, createProductDto);
-    return product ? this.productRepository.update(id, product) : null;
+    return product ? this.productRepository.update(id, product) : undefined;
   }
 
   async delete(id: number): Promise<any> {

@@ -1,6 +1,7 @@
+import { SalesProductDto } from './sales-product.dto';
+
 export interface SalesDto {
   customerId: number;
-  productId: number;
-  quantity: number;
   paymentMethodId: number;
+  products: SalesProductDto[];
 }

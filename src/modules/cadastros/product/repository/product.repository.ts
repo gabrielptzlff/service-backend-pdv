@@ -18,12 +18,12 @@ export class ProductRepository implements IProductRepository {
     );
   }
 
-  async findById(id: number): Promise<Product | null> {
+  async findById(id: number): Promise<Product | undefined> {
     const query = 'SELECT * FROM products WHERE id = $1';
     const result = await this.db.query(query, [id]);
 
     if (result.rows.length === 0) {
-      return null;
+      return undefined;
     }
 
     const row = result.rows[0];
@@ -48,7 +48,7 @@ export class ProductRepository implements IProductRepository {
   async update(
     id: number,
     productDto: Partial<ProductDto>,
-  ): Promise<Product | null> {
+  ): Promise<Product | undefined> {
     const fields: string[] = [];
     const values = [];
     let paramCount = 1;
@@ -74,7 +74,7 @@ export class ProductRepository implements IProductRepository {
     const result = await this.db.query(query, values);
 
     if (result.rows.length === 0) {
-      return null;
+      return undefined;
     }
 
     const row = result.rows[0];

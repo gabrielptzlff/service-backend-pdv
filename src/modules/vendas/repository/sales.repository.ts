@@ -10,16 +10,23 @@ export class SalesRepository implements ISalesRepository {
   constructor(private readonly db: Pool = pool) {}
 
   async findAll(): Promise<Sales[]> {
-    const query = 'SELECT * FROM sales';
+    const query = `SELECT * FROM sales`;
     const result = await this.db.query(query);
+    const rows = result.rows;
 
-    return result.rows.map(
-      (row) => new Sales(row.id, row.customerId, row.productId, row.paymentMethodId),
+    return rows.map(
+      (row) =>
+        new Sales(
+          row.id,
+          row.customer_id,
+          row.payment_method_id,
+          row.total_price,
+        ),
     );
   }
 
   async findById(id: number): Promise<Sales | null> {
-    const query = 'SELECT * FROM sales WHERE id = $1';
+    const query = `SELECT * FROM sales WHERE id = $1 `;
     const result = await this.db.query(query, [id]);
 
     if (result.rows.length === 0) {
@@ -27,28 +34,34 @@ export class SalesRepository implements ISalesRepository {
     }
 
     const row = result.rows[0];
-    return new Sales(row.id, row.customerId, row.productId, row.paymentMethodId);
+    return new Sales(
+      row.id,
+      row.customer_id,
+      row.payment_method_id,
+      row.total_price,
+    );
   }
 
-  async create(salesDto: SalesDto): Promise<Sales> {
+  async create(sales: Sales): Promise<Sales> {
     const query = `
-      INSERT INTO sales (customer_id, product_id, payment_method_id)
+      INSERT INTO sales (customer_id, payment_method_id, total_price)
       VALUES ($1, $2, $3)
-      RETURNING *
+      RETURNING id
     `;
 
-    const values = [salesDto.customerId, salesDto.productId, salesDto.paymentMethodId];
-
+    const values = [sales.customer, sales.paymentMethod, sales.totalPrice];
     const result = await this.db.query(query, values);
     const row = result.rows[0];
 
-    return new Sales(row.id, row.customerId, row.productId, row.paymentMethodId);
+    return new Sales(
+      row.id,
+      row.customer_id,
+      row.total_price,
+      row.payment_method_id,
+    );
   }
 
-  async update(
-    id: number,
-    salesDto: Partial<SalesDto>,
-  ): Promise<Sales | null> {
+  async update(id: number, salesDto: Partial<SalesDto>): Promise<Sales | null> {
     const fields: string[] = [];
     const values = [];
     let paramCount = 1;
@@ -78,7 +91,12 @@ export class SalesRepository implements ISalesRepository {
     }
 
     const row = result.rows[0];
-    return new Sales(row.id, row.customerId, row.productId, row.paymentMethodId);
+    return new Sales(
+      row.id,
+      row.customerId,
+      row.paymentMethodId,
+      row.totalPrice,
+    );
   }
 
   async delete(id: number): Promise<boolean> {

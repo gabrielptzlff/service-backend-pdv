@@ -2,9 +2,23 @@ import { IncomingMessage, ServerResponse } from 'http';
 import { SalesController } from './sales.controller';
 import { SalesService } from './sales.service';
 import { SalesRepository } from './repository/sales.repository';
+import { ProductRepository } from '../cadastros/product/repository/product.repository';
+import { SalesProductRepository } from './repository/sales-product.repository';
+import { PaymentMethodRepository } from '../cadastros/payment-method/repository/payment-method.repository';
+import { CustomerRepository } from '../cadastros/customer/repository/customer.repository';
 
-const repository = new SalesRepository();
-const service = new SalesService(repository);
+const salesRepository = new SalesRepository();
+const productRepository = new ProductRepository();
+const salesProductRepository = new SalesProductRepository();
+const paymentMethodRepository = new PaymentMethodRepository();
+const customerRepository = new CustomerRepository();
+const service = new SalesService(
+  salesRepository,
+  customerRepository,
+  salesProductRepository,
+  productRepository,
+  paymentMethodRepository,
+);
 const controller = new SalesController(service);
 
 function handleValidId(req: IncomingMessage): number | undefined {
@@ -95,48 +109,37 @@ export async function handleSalesRoutes(
   if (req.method === 'PATCH' && req.url?.startsWith('/sales')) {
     const id = handleValidId(req);
     let body = '';
-
     if (!id) {
       res.writeHead(400, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify({ error: 'Missing id query parameter' }));
-
       return;
     }
-
     req.on('data', (chunk) => {
       body += chunk;
     });
-
     req.on('end', async () => {
       if (!id || isNaN(id)) {
         res.writeHead(400, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({ error: 'Invalid or missing ID' }));
-
         return;
       }
-
       if (!body) {
         res.writeHead(400, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({ error: 'Empty or invalid body' }));
-
         return;
       }
-
       let salesDto;
-
       try {
         salesDto = JSON.parse(body);
       } catch (e) {
         res.writeHead(400, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({ error: 'Malformed JSON' }));
-
         return;
       }
       const result = await controller.update(id, salesDto);
       res.writeHead(200, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify(result));
     });
-
     return;
   }
 
