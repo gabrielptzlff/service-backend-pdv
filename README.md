@@ -5,7 +5,7 @@
 1. Clone o projeto em sua máquina
 
    ```bash
-       git clone git@github.com:gabrielptzlff/service-backend-pdv.git
+   git clone git@github.com:gabrielptzlff/service-backend-pdv.git
    ```
 
 2. Crie o .env para configurar as variáveis de ambiente
@@ -14,7 +14,19 @@
    cp ./.env.example ./.env
    ```
 
-3. Faça o build e start dos containers
+3. Instale os pacotes necessários
+
+   ```bash
+   npm i
+   ```
+
+4. Execute as migrations para criar as tabelas no banco de dados
+
+   ```bash
+   npm run migrate up
+   ```
+
+4. Faça o build e start dos containers
 
    ```bash
    make build && make start
