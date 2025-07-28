@@ -30,6 +30,13 @@ export class ProductRepository implements IProductRepository {
     return new Product(row.id, row.name, row.price, row.quantity);
   }
 
+  async findInSalesById(productId: number): Promise<boolean> {
+    const query = 'SELECT 1 FROM sales_products WHERE product_id = $1 LIMIT 1';
+    const result = await this.db.query(query, [productId]);
+
+    return (result.rowCount ?? 0) > 0;
+  }
+
   async create(productDto: ProductDto): Promise<Product> {
     const query = `
       INSERT INTO products (name, price, quantity)

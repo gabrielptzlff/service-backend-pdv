@@ -11,8 +11,8 @@ export async function up() {
     );
 
     ALTER TABLE sales_products
-    ADD CONSTRAINT fk_product_id FOREIGN KEY (product_id) REFERENCES products(id),
-    ADD CONSTRAINT fk_sales_id FOREIGN KEY (sales_id) REFERENCES sales(id)
+    ADD CONSTRAINT fk_product_id FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE,
+    ADD CONSTRAINT fk_sales_id FOREIGN KEY (sales_id) REFERENCES sales(id) ON DELETE CASCADE
   `);
 
   console.log('Migration UP: sales_products table created');

@@ -42,7 +42,17 @@ export class PaymentMethodService {
   async delete(id: number): Promise<any> {
     const paymentMethod = await this.paymentMethodRepository.findById(id);
     if (!paymentMethod) {
-      throw new Error(`PaymentMethod with id ${id} not found`);
+      throw new Error(`Payment method with id ${id} not found`);
+    }
+
+    // Verifica se o método de pagamento está associado a vendas
+    const salesPaymentMethod =
+      await this.paymentMethodRepository.findInSalesById(id);
+
+    if (salesPaymentMethod) {
+      throw new Error(
+        `Payment method with id ${id} cannot be deleted because it is associated with sales`,
+      );
     }
 
     return this.paymentMethodRepository.delete(id);

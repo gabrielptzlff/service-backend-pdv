@@ -4,6 +4,7 @@ import { Customer } from '../entity/customer.entity';
 export interface ICustomerRepository {
   create(customerDto: CustomerDto): Promise<Customer>;
   findById(id: number): Promise<Customer | null>;
+  findInSalesById(id: number): Promise<boolean>;
   findAll(): Promise<Customer[]>;
   update(
     id: number,

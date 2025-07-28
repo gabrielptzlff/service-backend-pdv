@@ -5,10 +5,9 @@ export interface ISalesProductRepository {
   create(salesProductDto: SalesProduct): Promise<SalesProduct>;
   findById(id: number): Promise<SalesProduct | null>;
   findBySalesId(salesId: number): Promise<any[]>;
-  findAll(): Promise<SalesProduct[]>;
   update(
     id: number,
     salesProductDto: Partial<SalesProductDto>,
   ): Promise<SalesProduct | null>;
-  delete(id: number): Promise<boolean>;
+  deleteBySalesId(salesId: number): Promise<void>;
 }

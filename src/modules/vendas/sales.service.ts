@@ -8,6 +8,7 @@ import { IPaymentMethodRepository } from '../cadastros/payment-method/repository
 import { PaymentMethod } from '../cadastros/payment-method/entity/payment-method.entity';
 import { ICustomerRepository } from '../cadastros/customer/repository/customer.repository.interface';
 import { ISalesProductRepository } from './repository/sales-product.repository.interface';
+import { UpdateSalesDto } from './dto/update-sales.dto';
 
 @injectable()
 export class SalesService {
@@ -42,7 +43,7 @@ export class SalesService {
           ...sale,
           customer: customer ? [customer] : [],
           paymentMethod: paymentMethod ? [paymentMethod] : [],
-          items: products,
+          products: products,
         };
       }),
     );
@@ -66,11 +67,19 @@ export class SalesService {
       ...sale,
       customer: customer ? [customer] : [],
       paymentMethod: paymentMethod ? [paymentMethod] : [],
-      items: products,
+      products: products,
     };
   }
 
   async create(createSalesDto: SalesDto): Promise<any> {
+    const customer = await this.customerRepository.findById(
+      createSalesDto.customerId,
+    );
+    if (!customer) {
+      throw new Error(
+        `Customer with id ${createSalesDto.customerId} not found`,
+      );
+    }
     const products = await Promise.all(
       createSalesDto.products.map(async (product) => {
         const foundProduct = await this.productRepository.findById(product.id);
@@ -80,6 +89,7 @@ export class SalesService {
         return { ...foundProduct, quantity: product.quantity };
       }),
     );
+
     const totalPrice = products.reduce(
       (sum, product) => sum + product.price * product.quantity,
       0,
@@ -99,10 +109,12 @@ export class SalesService {
       createSalesDto.paymentMethodId,
       totalPrice,
     );
+
     const createdSales = await this.salesRepository.create(sales);
     if (!createdSales || !createdSales.id) {
       throw new Error('Failed to create sales');
     }
+
     await Promise.all(
       products.map(async (product) =>
         this.salesProductRepository.create({
@@ -126,11 +138,11 @@ export class SalesService {
     return this.getById(createdSales.id);
   }
 
-  async update(id: number, updateSalesDto: SalesDto): Promise<any> {
+  async update(id: number, updateSalesDto: UpdateSalesDto): Promise<any> {
     // Busca a venda existente
-    const existingSale = await this.salesRepository.findById(id);
+    const existingSale = await this.getById(id);
     if (!existingSale) {
-      throw new Error(`Sales with id ${id} not found`);
+      throw new Error(`Sale with id ${id} not found`);
     }
 
     // Atualiza os dados principais da venda
@@ -149,10 +161,9 @@ export class SalesService {
       0,
     );
 
-    const paymentMethod: PaymentMethod | null =
-      await this.paymentMethodRepository.findById(
-        updateSalesDto.paymentMethodId,
-      );
+    const paymentMethod = await this.paymentMethodRepository.findById(
+      updateSalesDto.paymentMethodId,
+    );
     if (!paymentMethod) {
       throw new Error(
         `Payment method with id ${updateSalesDto.paymentMethodId} not found`,
@@ -163,18 +174,20 @@ export class SalesService {
     await this.salesRepository.update(id, {
       customerId: updateSalesDto.customerId,
       paymentMethodId: updateSalesDto.paymentMethodId,
+      totalPrice: totalPrice,
     });
 
-    // Atualiza os produtos da venda
+    await this.salesProductRepository.deleteBySalesId(id);
+
     await Promise.all(
-      products.map((product) =>
-        this.salesProductRepository.create({
+      products.map(async (product) => {
+        await this.salesProductRepository.create({
           salesId: id,
           product: product,
           quantity: product.quantity,
           unit_price: product.price,
-        }),
-      ),
+        });
+      }),
     );
 
     return this.getById(id);
@@ -182,8 +195,9 @@ export class SalesService {
 
   async delete(id: number): Promise<any> {
     const sales = await this.salesRepository.findById(id);
+
     if (!sales) {
-      throw new Error(`Sales with id ${id} not found`);
+      throw new Error('Sale not found');
     }
 
     return this.salesRepository.delete(id);

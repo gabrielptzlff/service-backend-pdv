@@ -8,5 +8,4 @@ export interface CustomerDto {
   neighborhood?: string;
   city?: string;
   state?: string;
-  teste?: string;
 }

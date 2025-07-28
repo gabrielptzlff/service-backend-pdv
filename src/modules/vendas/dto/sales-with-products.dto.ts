@@ -7,5 +7,5 @@ export interface SalesWithProductsDto {
   customer: Customer[];
   paymentMethod: PaymentMethod[];
   totalPrice: number;
-  items: Product[];
+  products: Product[];
 }

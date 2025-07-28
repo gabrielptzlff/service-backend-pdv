@@ -4,6 +4,7 @@ import { PaymentMethod } from '../entity/payment-method.entity';
 export interface IPaymentMethodRepository {
   create(paymentMethodDto: PaymentMethodDto): Promise<PaymentMethod>;
   findById(id: number): Promise<PaymentMethod | null>;
+  findInSalesById(id: number): Promise<boolean>;
   findAll(): Promise<PaymentMethod[]>;
   update(
     id: number,

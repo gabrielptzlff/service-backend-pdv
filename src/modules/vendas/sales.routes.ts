@@ -6,6 +6,7 @@ import { ProductRepository } from '../cadastros/product/repository/product.repos
 import { SalesProductRepository } from './repository/sales-product.repository';
 import { PaymentMethodRepository } from '../cadastros/payment-method/repository/payment-method.repository';
 import { CustomerRepository } from '../cadastros/customer/repository/customer.repository';
+import { getValidId } from '../../utils/httpHandlers/validateId';
 
 const salesRepository = new SalesRepository();
 const productRepository = new ProductRepository();
@@ -20,14 +21,6 @@ const service = new SalesService(
   paymentMethodRepository,
 );
 const controller = new SalesController(service);
-
-function handleValidId(req: IncomingMessage): number | undefined {
-  const url = new URL(req.url!, `http://${req.headers.host}`);
-  const idParam = url.searchParams.get('id');
-  if (!idParam) return undefined;
-  const id = parseInt(idParam);
-  return !id || isNaN(id) ? undefined : id;
-}
 
 export async function handleSalesRoutes(
   req: IncomingMessage,
@@ -45,14 +38,9 @@ export async function handleSalesRoutes(
   }
 
   if (req.method === 'GET' && req.url?.includes('/sales?')) {
-    const id = handleValidId(req);
+    const id = getValidId(req, res);
 
-    if (!id) {
-      res.writeHead(400, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify({ error: 'Missing id query parameter' }));
-
-      return;
-    }
+    if (!id) return;
 
     (async () => {
       const sales = await controller.getById(id);
@@ -107,66 +95,75 @@ export async function handleSalesRoutes(
   }
 
   if (req.method === 'PATCH' && req.url?.startsWith('/sales')) {
-    const id = handleValidId(req);
+    const id = getValidId(req, res);
+
+    if (!id) return;
+
     let body = '';
-    if (!id) {
-      res.writeHead(400, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify({ error: 'Missing id query parameter' }));
-      return;
-    }
+
     req.on('data', (chunk) => {
       body += chunk;
     });
     req.on('end', async () => {
-      if (!id || isNaN(id)) {
-        res.writeHead(400, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ error: 'Invalid or missing ID' }));
-        return;
-      }
       if (!body) {
         res.writeHead(400, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({ error: 'Empty or invalid body' }));
         return;
       }
-      let salesDto;
+      let updateSalesDto;
       try {
-        salesDto = JSON.parse(body);
+        updateSalesDto = JSON.parse(body);
       } catch (e) {
         res.writeHead(400, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({ error: 'Malformed JSON' }));
         return;
       }
-      const result = await controller.update(id, salesDto);
-      res.writeHead(200, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify(result));
+
+      try {
+        const result = await controller.update(id, updateSalesDto);
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify(result));
+      } catch (error: any) {
+        if (error.message === `Sale with id ${id} not found`) {
+          res.writeHead(404, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ error: error.message }));
+        } else {
+          res.writeHead(500, { 'Content-Type': 'application/json' });
+          res.end(
+            JSON.stringify({
+              error: `Internal server error: ${error.message}`,
+            }),
+          );
+        }
+      }
     });
     return;
   }
 
   if (req.method === 'DELETE' && req.url?.startsWith('/sales')) {
-    const id = handleValidId(req);
+    const id = getValidId(req, res);
 
-    if (!id) {
-      res.writeHead(400, { 'Content-Type': 'application/json' });
-      res.end(
-        JSON.stringify({ error: 'Missing or invalid id query parameter' }),
-      );
-
-      return;
-    }
+    if (!id) return;
 
     (async () => {
-      const sales = await controller.delete(id);
+      try {
+        await controller.delete(id);
 
-      if (!sales) {
-        res.writeHead(404, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ error: 'Sales not found' }));
-
-        return;
+        res.writeHead(204, { 'Content-Type': 'application/json' });
+        res.end();
+      } catch (error: any) {
+        if (error.message === 'Sale not found') {
+          res.writeHead(404, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ error: error.message }));
+        } else {
+          res.writeHead(500, { 'Content-Type': 'application/json' });
+          res.end(
+            JSON.stringify({
+              error: `Internal server error: ${error.message}`,
+            }),
+          );
+        }
       }
-
-      res.writeHead(204, { 'Content-Type': 'application/json' });
-      res.end();
     })();
 
     return;

@@ -9,26 +9,6 @@ import { SalesProductDto } from '../dto/sales-product.dto';
 export class SalesProductRepository implements ISalesProductRepository {
   constructor(private readonly db: Pool = pool) {}
 
-  async findAll(): Promise<SalesProduct[]> {
-    const query = 'SELECT * FROM sales_products';
-    const result = await this.db.query(query);
-
-    return result.rows.map(
-      (row) =>
-        new SalesProduct(
-          row.sales_id,
-          {
-            id: row.product_id,
-            name: row.product_name,
-            price: row.product_price,
-            quantity: row.product_quantity,
-          },
-          row.quantity,
-          row.unit_price,
-        ),
-    );
-  }
-
   async findById(id: number): Promise<SalesProduct | null> {
     const query = 'SELECT * FROM sales_products WHERE id = $1';
     const result = await this.db.query(query, [id]);
@@ -128,9 +108,9 @@ export class SalesProductRepository implements ISalesProductRepository {
     );
   }
 
-  async delete(id: number): Promise<boolean> {
-    const query = 'DELETE FROM sales_products WHERE id = $1';
-    const result = await this.db.query(query, [id]);
-    return (result.rowCount ?? 0) > 0;
+  async deleteBySalesId(salesId: number): Promise<void> {
+    await this.db.query('DELETE FROM sales_products WHERE sales_id = $1', [
+      salesId,
+    ]);
   }
 }

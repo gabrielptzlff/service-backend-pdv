@@ -41,6 +41,15 @@ export class CustomerService {
       throw new Error(`Customer with id ${id} not found`);
     }
 
+    // Regra: Verifica se o cliente está associado a vendas
+    const salesCustomer = await this.customerRepository.findInSalesById(id);
+
+    if (salesCustomer) {
+      throw new Error(
+        `Customer with id ${id} cannot be deleted because it is associated with sales`,
+      );
+    }
+
     return this.customerRepository.delete(id);
   }
 }

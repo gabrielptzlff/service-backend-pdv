@@ -53,6 +53,13 @@ export class CustomerRepository implements ICustomerRepository {
     );
   }
 
+  async findInSalesById(id: number): Promise<boolean> {
+    const query = `SELECT 1 FROM sales_products WHERE customer_id = $1 LIMIT 1`;
+    const result = await this.db.query(query, [id]);
+
+    return (result.rowCount ?? 0) > 0;
+  }
+
   async create(customerDto: CustomerDto): Promise<Customer> {
     const query = `
       INSERT INTO customers (name, email, postal_code, street, number, complement, neighborhood, city, state)

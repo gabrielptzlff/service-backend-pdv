@@ -7,14 +7,15 @@
     "dev": "nodemon --watch src --exec ts-node src/index.ts",
     "build": "tsc",
     "start": "node dist/index.js",
-    "test": "jest",
-    "test:watch": "jest --watch",
-    "test:cov": "jest --coverage",
+    "test": "tsc && jest",
+    "test:watch": "tsc && jest --watch",
+    "test:cov": "tsc && jest --coverage",
     "migrate": "ts-node ./src/infra/db/migrations/run-migrations.ts"
   },
   "dependencies": {
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.2",
+    "http-errors": "^2.0.0",
     "pg": "^8.16.3",
     "reflect-metadata": "^0.1.14",
     "repository-pattern": "^1.0.21",
@@ -23,6 +24,7 @@
     "typedi": "^0.10.0"
   },
   "devDependencies": {
+    "@types/http-errors": "^2.0.5",
     "@types/jest": "^29.5.3",
     "@types/node": "^20.19.9",
     "@types/pg": "^8.15.4",

@@ -9,6 +9,7 @@ import {
 } from 'routing-controllers';
 import { SalesDto } from './dto/sales.dto';
 import { SalesService } from './sales.service';
+import { UpdateSalesDto } from './dto/update-sales.dto';
 
 @JsonController('/payment-methods')
 export class SalesController {
@@ -30,8 +31,11 @@ export class SalesController {
   }
 
   @Patch('/:id')
-  async update(@Param('id') id: number, @Body() salesDto: SalesDto) {
-    return this.salesService.update(id, salesDto);
+  async update(
+    @Param('id') id: number,
+    @Body() updateSalesDto: UpdateSalesDto,
+  ) {
+    return this.salesService.update(id, updateSalesDto);
   }
 
   @Delete('/:id')

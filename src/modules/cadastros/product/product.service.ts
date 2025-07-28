@@ -10,6 +10,7 @@ export class ProductService {
     private readonly productRepository: IProductRepository,
   ) {}
 
+  // Possível melhoria: validar a quantidade e preço antes de disponibilizar o produto para venda
   async getAll(): Promise<Product[]> {
     return this.productRepository.findAll();
   }
@@ -22,6 +23,10 @@ export class ProductService {
     return this.productRepository.create(createProductDto);
   }
 
+  /* Possíveis melhorias: 
+  1. Bloquear a redução de quantidade abaixo de zero
+  2. Bloquear a redução manual de quantidade caso o produto esteja associado a vendas
+  */
   async update(
     id: number,
     createProductDto: ProductDto,
@@ -39,6 +44,15 @@ export class ProductService {
     const product = await this.productRepository.findById(id);
     if (!product) {
       throw new Error(`Product with id ${id} not found`);
+    }
+
+    // Verifica se o produto está associado a vendas
+    const salesProduct = await this.productRepository.findInSalesById(id);
+
+    if (salesProduct) {
+      throw new Error(
+        `Product with id ${id} cannot be deleted because it is associated with sales`,
+      );
     }
 
     return this.productRepository.delete(id);

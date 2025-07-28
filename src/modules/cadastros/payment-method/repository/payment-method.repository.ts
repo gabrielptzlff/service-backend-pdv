@@ -86,4 +86,11 @@ export class PaymentMethodRepository implements IPaymentMethodRepository {
     const result = await this.db.query(query, [id]);
     return (result.rowCount ?? 0) > 0;
   }
+
+  async findInSalesById(paymentMethodId: number): Promise<boolean> {
+    const query = 'SELECT 1 FROM sales WHERE payment_method_id = $1 LIMIT 1';
+    const result = await this.db.query(query, [paymentMethodId]);
+
+    return (result.rowCount ?? 0) > 0;
+  }
 }

@@ -5,6 +5,7 @@ export interface IProductRepository {
   create(productDto: ProductDto): Promise<Product>;
   findById(id: number): Promise<Product | undefined>;
   findAll(): Promise<Product[]>;
+  findInSalesById(productId: number): Promise<boolean>;
   update(
     id: number,
     productDto: Partial<ProductDto>,

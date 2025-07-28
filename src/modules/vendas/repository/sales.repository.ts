@@ -4,6 +4,7 @@ import { SalesDto } from '../dto/sales.dto';
 import { Sales } from '../entity/sales.entity';
 import { pool } from '../../../infra/db/pg-connection';
 import { ISalesRepository } from './sales.repository.interface';
+import { UpdateSalesDto } from '../dto/update-sales.dto';
 
 @injectable()
 export class SalesRepository implements ISalesRepository {
@@ -61,11 +62,23 @@ export class SalesRepository implements ISalesRepository {
     );
   }
 
-  async update(id: number, salesDto: Partial<SalesDto>): Promise<Sales | null> {
+  async update(
+    id: number,
+    updateSalesDto: Partial<UpdateSalesDto>,
+  ): Promise<Sales | null> {
     const fields: string[] = [];
     const values = [];
     let paramCount = 1;
-    Object.entries(salesDto).forEach(([key, value]) => {
+    const fieldMap = {
+      customerId: 'customer_id',
+      paymentMethodId: 'payment_method_id',
+      totalPrice: 'total_price',
+    };
+
+    Object.entries(updateSalesDto).forEach(([key, value]) => {
+      if (key in fieldMap) {
+        key = fieldMap[key as keyof typeof fieldMap];
+      }
       if (value !== undefined) {
         fields.push(`${key} = $${paramCount}`);
         values.push(value);
@@ -93,9 +106,9 @@ export class SalesRepository implements ISalesRepository {
     const row = result.rows[0];
     return new Sales(
       row.id,
-      row.customerId,
-      row.paymentMethodId,
-      row.totalPrice,
+      row.customer_id,
+      row.payment_method_id,
+      row.total_price,
     );
   }
 
