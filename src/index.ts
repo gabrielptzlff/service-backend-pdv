@@ -13,6 +13,12 @@ const server = http.createServer((req, res) => {
     'GET,HEAD,PUT,PATCH,POST,DELETE',
   );
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  if (req.method === 'OPTIONS') {
+    res.writeHead(204);
+    res.end();
+    return;
+  }
+  
   router(req, res);
 });
 
