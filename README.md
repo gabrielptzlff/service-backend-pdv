@@ -40,14 +40,26 @@ Para rodar o projeto em ambiente de desenvolvimento:
 
 2. Altere a variável DB_HOST no `.env` para localhost
 
-3. Execute:
+3. instale as dependências:
+
+   ```bash
+   npm i
+   ```
+
+4. Execute o container do postgres:
 
    ```bash
    sudo docker compose up postgres --build -d
    ```
 
+5. Execute as migrations localmente:
+
    ```bash
-   npm i && npm run dev
+   npm run migrate up
+   ```
+
+6. ```bash
+    && npm run dev
    ```
 
 - Alguns comandos docker foram simplificados utilizando Make
