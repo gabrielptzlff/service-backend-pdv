@@ -26,10 +26,6 @@
    make build && make start
    ```
 
-#### **Cuidado!**
-
-As migrations 'up' e 'down' são rodadas junto com 'make start (up)' e 'make down (down)'. Não foi criado um mapeamento para verificar quais migrations já foram rodadas e quais não foram, up cria tudo e down remove TODAS as tabelas e seus dados.
-
 > A network `pdv-network` serve para que os containers possam comunicar-se, é necessário buildar este docker-compose antes de subir os outros projetos, pois são dependentes da network (exceto o microsserviço de cep)
 
 ### Ambiente de desenvolvimento
@@ -53,8 +49,6 @@ Para rodar o projeto em ambiente de desenvolvimento:
    ```bash
    npm i && npm run dev
    ```
-
-> O .env DB_HOST pode ser o localhost, já em produção, o nome do container do postgres
 
 - Alguns comandos docker foram simplificados utilizando Make
 
