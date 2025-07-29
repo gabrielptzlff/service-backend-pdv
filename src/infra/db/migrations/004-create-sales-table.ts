@@ -8,10 +8,32 @@ export async function up() {
       payment_method_id INT NOT NULL,
       total_price NUMERIC(10, 4) NOT NULL
     );
+  `);
 
-    ALTER TABLE sales
-    ADD CONSTRAINT fk_customer_id FOREIGN KEY (customer_id) REFERENCES customers(id),
-    ADD CONSTRAINT fk_payment_method_id FOREIGN KEY (payment_method_id) REFERENCES payment_methods(id)
+  await pool.query(`
+    DO $$
+    BEGIN
+      IF NOT EXISTS (
+        SELECT 1 FROM pg_constraint WHERE conname = 'fk_customer_id'
+      ) THEN
+        ALTER TABLE sales
+        ADD CONSTRAINT fk_customer_id FOREIGN KEY (customer_id) REFERENCES customers(id);
+      END IF;
+    END
+    $$;
+  `);
+
+  await pool.query(`
+    DO $$
+    BEGIN
+      IF NOT EXISTS (
+        SELECT 1 FROM pg_constraint WHERE conname = 'fk_payment_method_id'
+      ) THEN
+        ALTER TABLE sales
+        ADD CONSTRAINT fk_payment_method_id FOREIGN KEY (payment_method_id) REFERENCES payment_methods(id);
+      END IF;
+    END
+    $$;
   `);
 
   console.log('Migration UP: sales table created');
@@ -19,11 +41,22 @@ export async function up() {
 
 export async function down() {
   await pool.query(`
-    ALTER TABLE sales
-    DROP CONSTRAINT fk_customer_id,
-    DROP CONSTRAINT fk_payment_method_id;
-
-    DROP TABLE IF EXISTS sales;`);
+    DO $$
+    BEGIN
+      IF EXISTS (
+        SELECT 1 FROM pg_constraint WHERE conname = 'fk_customer_id'
+      ) THEN
+        ALTER TABLE sales DROP CONSTRAINT fk_customer_id;
+      END IF;
+      IF EXISTS (
+        SELECT 1 FROM pg_constraint WHERE conname = 'fk_payment_method_id'
+      ) THEN
+        ALTER TABLE sales DROP CONSTRAINT fk_payment_method_id;
+      END IF;
+    END
+    $$;
+    DROP TABLE IF EXISTS sales;
+  `);
 
   console.log('Migration DOWN: sales table dropped');
 }
