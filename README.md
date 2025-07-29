@@ -1,6 +1,6 @@
 # service-backend-pdv
 
-## Instalação
+## Instalação Docker
 
 1. Clone o projeto em sua máquina
 
@@ -11,7 +11,7 @@
 2. Crie o .env para configurar as variáveis de ambiente
 
    ```bash
-   cp ./.env.example ./.env
+   cp ./.env.homolog ./.env
    ```
 
 3. Instale os pacotes necessários
@@ -20,29 +20,41 @@
    npm i
    ```
 
-4. Execute as migrations para criar as tabelas no banco de dados
-
-   ```bash
-   npm run migrate up
-   ```
-
 4. Faça o build e start dos containers
 
    ```bash
    make build && make start
    ```
 
+#### **Cuidado!**
+
+As migrations 'up' e 'down' são rodadas junto com 'make start (up)' e 'make down (down)'. Não foi criado um mapeamento para verificar quais migrations já foram rodadas e quais não foram, up cria tudo e down remove TODAS as tabelas e seus dados.
+
 > A network `pdv-network` serve para que os containers possam comunicar-se, é necessário buildar este docker-compose antes de subir os outros projetos, pois são dependentes da network (exceto o microsserviço de cep)
 
 ### Ambiente de desenvolvimento
 
-- Para rodar o projeto em ambiente de desenvolvimento execute:
+Para rodar o projeto em ambiente de desenvolvimento:
 
-  ```bash
-  npm i && npm run dev
-  ```
+1. Crie o .env para configurar as variáveis de ambiente
 
-  > O .env DB_HOST pode ser o localhost, já em produção, o nome do container do postgres
+   ```bash
+   cp ./.env.homolog ./.env
+   ```
+
+2. Altere a variável DB_HOST no `.env` para localhost
+
+3. Execute:
+
+   ```bash
+   sudo docker compose up postgres --build -d
+   ```
+
+   ```bash
+   npm i && npm run dev
+   ```
+
+> O .env DB_HOST pode ser o localhost, já em produção, o nome do container do postgres
 
 - Alguns comandos docker foram simplificados utilizando Make
 
